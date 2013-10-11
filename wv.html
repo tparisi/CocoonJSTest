@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>My First CocoonJS Program</title>
+</head>
+<body>
+<div style="color:Green;">
+Hello World
+</div>
+<button onclick="onbuttonclick();">Push Me</button>
+</body>
+<script src="./libs/cocoon_cocoonjsextensions/CocoonJS.js"></script>
+<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App.js"></script>
+<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App_ForWebView.js"></script>
+<script>
+
+function onbuttonclick() {
+	CocoonJS.App.forwardAsync("changeColor();");
+}
+</script>
+</html>
