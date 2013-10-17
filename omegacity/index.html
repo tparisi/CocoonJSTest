@@ -81,7 +81,6 @@
 
 		setTimeout(function() {
 			
-			CocoonJS.App.loadInTheWebView("wv.html");
 			CocoonJS.App.onLoadInTheWebViewSucceed.addEventListener(
 					function(url) {
 						CocoonJS.App.showTheWebView();
@@ -98,6 +97,7 @@
 						Vizi.System.log("load web view failed.", url);
 					}
 					);
+			CocoonJS.App.loadInTheWebView("wv.html");
 		}, 10);
 				
 		sound.enterState("load");

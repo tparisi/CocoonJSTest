@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>three.js glTF Loader</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                font-family: Monospace;
+            /*    background-color: #EEF; */
+				background-color:rgba(0, 0, 0, 0);
+                margin: 0px;
+                overflow: hidden;
+            }
+            #info {
+                position: absolute;
+                top: 10px;
+                width: 100%;
+                text-align: center;
+                z-index: 100;
+                display:block;
+            }
+            
+            #controls {
+            	position:absolute;
+            	width:25%;
+            	left:75%;
+            	bottom:0%;
+            	height:134px;
+            	background-color:White;
+            	opacity:.9;
+            	font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
+            }
+
+            #status {
+            	position:absolute;
+            	width:25%;
+            	left:2%;
+            	top:95%;
+            	height:5%;
+            	opacity:.9;
+            	font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
+            }
+            
+            .control {
+            	position:absolute;
+            	margin-left:12px;
+            	width:100%;
+            	font-weight:bold;
+            }
+                        
+            .controlValue {
+            	position:absolute;
+            	left:50%;
+            	top:0%;
+            }
+            
+            #scenes_control {
+            	position:absolute;
+            	top:8px;
+            }
+
+            #cameras_control {
+            	position:absolute;
+            	top:40px;
+            }
+
+            #animations_control {
+            	position:absolute;
+            	top:72px;
+            }
+            
+            #buffer_geometry_control {
+            	position:absolute;
+            	top:104px;
+            }
+                        
+            #info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+        </style>
+    </head>
+
+    <body>
+        <div id="info">
+        <a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - glTF Loader
+        </div>
+		<div id="container">
+		</div>
+		<div id="status">
+		</div>
+		<div id="controls">
+			<div class="control" id="scenes_control">
+				Model
+				<select class="controlValue" id="scenes_list" size="1" onchange="selectScene();" ondblclick="selectScene();">
+				</select>
+			</div>
+			
+			<div class="control" id="cameras_control">
+				Camera
+				<select class="controlValue" id="cameras_list" size="1" onchange="selectCamera();" ondblclick="selectCamera();">
+				</select>
+			</div>
+			<div class="control" id="animations_control">
+				Animations
+				<div class="controlValue"><input type="checkbox" checked onclick="toggleAnimations();">Play</input></div>
+			</div>
+			<div class="control" id="buffer_geometry_control">
+				Geometry
+				<div class="controlValue">
+				<input type="checkbox" id="buffer_geometry_checkbox" checked onclick="toggleBufferGeometry();">BufferGeometry</input>
+				</div>
+			</div>
+		</div>
+        <script src="./libs/three.js.r59/three.js"></script>
+		<script src="./libs/cocoon_cocoonjsextensions/CocoonJS.js"></script>
+		<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App.js"></script>
+		<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App_ForWebView.js"></script>
+
+        <script>
+			
+			function onload() {
+
+				var sceneListJSON = JSON.stringify(sceneList);
+				CocoonJS.App.forward("useBufferGeometry = " + useBufferGeometry + ";");
+				CocoonJS.App.forward("sceneList = " + sceneListJSON + ";");
+                buildSceneList();
+				initScene(0);
+                animate();
+            }
+
+			var sceneList = 
+				[
+	                 { name : "Virtual City", url : "./model/vc/vc.json", 
+		                 cameraPos: new THREE.Vector3(0, 3, 10),
+		                 objectRotation: new THREE.Euler(-Math.PI / 2, 0, 0), 
+		                 cameras: {"Camera02" : "", "Camera05" : "", "Camera11" : "", "Camera15" : ""}},
+		             { name : "Monster", url : "./model/monster/monster.json", 
+			                 cameraPos: new THREE.Vector3(0, 1, 100), 
+			                 objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
+			                 objectPosition: new THREE.Vector3(0, 0, 0),
+			                 objectRotation: new THREE.Euler(-Math.PI / 2, 0, -Math.PI / 2),
+			                 addLights:true,
+			                 shadows:true,
+			                 addGround:true },
+		             { name : "BrainSteam", url : "./model/brainsteam/brainsteam.json", 
+			                 cameraPos: new THREE.Vector3(0, 6, 13), 
+			                 center: new THREE.Vector3(0, 3, 0), 
+			                 addLights:true,
+			                 shadows:true,
+			                 addGround:true },
+	                 { name : "Duck", url : "./model/duck/duck.json", 
+		                 cameraPos: new THREE.Vector3(0, 30, -50),
+		                 objectScale: new THREE.Vector3(0.1, 0.1, 0.1),
+		                 addLights:false,
+		                 addGround:false,
+		                 shadows:false },
+     			];
+
+			function buildSceneList()
+			{
+				var elt = document.getElementById('scenes_list');
+				while( elt.hasChildNodes() ){
+				    elt.removeChild(elt.lastChild);
+				}
+
+				var i, len = sceneList.length;
+				for (i = 0; i < len; i++)
+				{
+					option = document.createElement("option");
+					option.text=sceneList[i].name;
+					elt.add(option);
+				}		
+			}
+
+			function initScene(index) {
+				CocoonJS.App.forwardAsync("initScene(" + index + ");");
+			}
+			
+			function animate() {
+				CocoonJS.App.forwardAsync("animate();");
+			}
+			
+			function switchScene(index)
+			{
+				cleanup();
+				initScene(index);
+				var elt = document.getElementById('scenes_list');
+				elt.selectedIndex = index;
+			}
+
+			function selectScene()
+			{
+			    var select = document.getElementById("scenes_list");
+			    var index = select.selectedIndex;
+				if (index >= 0)
+				{
+					switchScene(index);
+				}
+			}
+			
+			function switchCamera(index)
+			{
+				cameraIndex = index;
+				
+				CocoonJS.App.forwardAsync("switchCamera(" + index + ");");
+
+				var elt = document.getElementById('cameras_list');
+				elt.selectedIndex = cameraIndex;				
+			}
+					
+			function updateCamerasList(cameraNames) {
+				var elt = document.getElementById('cameras_list');
+				while( elt.hasChildNodes() ){
+				    elt.removeChild(elt.lastChild);
+				}
+
+				option = document.createElement("option");
+				option.text="[default]";
+				elt.add(option);
+				
+				var i, len = cameraNames.length;
+				for (i = 0; i < len; i++)
+				{
+					option = document.createElement("option");
+					option.text=cameraNames[i];
+					elt.add(option);
+				}		
+			}
+			
+			function selectCamera() {
+			    var select = document.getElementById("cameras_list");
+			    var index = select.selectedIndex;
+				if (index >= 0)
+				{
+					switchCamera(index);
+				}
+			}
+
+			function toggleAnimations() {
+				CocoonJS.App.forwardAsync("toggleAnimations();");
+			}
+
+			var usebuf = document.getElementById("buffer_geometry_checkbox");
+			var useBufferGeometry = usebuf.hasAttribute("checked");
+			function toggleBufferGeometry()
+			{
+				CocoonJS.App.forwardAsync("toggleBufferGeometry();");				
+				selectScene();
+			}
+			
+			function cleanup() {
+
+				CocoonJS.App.forwardAsync("cleanup();");
+	            cameraIndex = 0;
+			}
+			
+            onload();
+        </script>
+
+    </body>
+</html>

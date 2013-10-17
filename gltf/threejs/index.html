@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>three.js glTF Loader</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            #container {
+            	position: absolute;
+            	top: 0px;
+            	width:100%;
+            	height:100%;
+            	z-index: -1;
+            }            
+        </style>
+    </head>
+
+    <body>
+		<div id="container">
+		</div>
+        <script src="./libs/three.js.r59/three.js"></script>
+        <script src="./libs/three.js.r59/controls/OrbitControls.js"></script>
+		<script src="./libs/cocoon_cocoonjsextensions/CocoonJS.js"></script>
+		<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App.js"></script>
+		<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App_ForCocoonJS.js"></script>
+        <script src="./webgl-tf-loader.js"></script>
+        <script src="glTFLoader.js"></script>
+        <script src="glTFLoaderUtils.js"></script>
+        <script src="glTFAnimation.js"></script>
+
+        <script>
+        	var orbitControls = null;
+            var container, camera, scene, renderer, loader;
+
+            var cameraIndex = 0;
+			var cameras = [];
+			var cameraNames = [];
+			var defaultCamera = null;
+			var gltf = null;
+
+			var useBufferGeometry = true;
+			
+			function onload() {
+
+				CocoonJS.App.onLoadInTheWebViewSucceed.addEventListener(
+						function(url) {
+							CocoonJS.App.showTheWebView();
+							console.log("load web view succeeded.");
+							wvLoadComplete = true;
+												
+						}
+						);
+				CocoonJS.App.onLoadInTheWebViewFailed.addEventListener(
+						function(url) {
+							console.log("load web view failed.", url);
+						}
+						);
+				CocoonJS.App.loadInTheWebView("wv.html");
+            }
+
+            function initScene(index) {
+                container = document.getElementById( 'container' );
+
+                scene = new THREE.Scene();
+
+                defaultCamera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 10000 );
+                
+                //defaultCamera.up = new THREE.Vector3( 0, 1, 0 );
+                scene.add( defaultCamera );
+                camera = defaultCamera;
+
+                var sceneInfo = sceneList[index];
+
+                if (sceneInfo.addLights) {
+                    
+                    var ambient = new THREE.AmbientLight( 0x111111 );
+                    scene.add( ambient );
+
+                	var directionalLight = new THREE.DirectionalLight( 0xdddddd );
+                	directionalLight.position.set( 0, -1, 1 ).normalize();
+                	scene.add( directionalLight );
+                
+	                var spot1   = new THREE.SpotLight( 0x888888, 2 );
+	                spot1.position.set( -100, 200, 100 );
+	                spot1.target.position.set( 0, 0, 0 );
+
+	                if (sceneInfo.shadows) {
+		                
+		                spot1.shadowCameraNear      = 1;
+		                spot1.shadowCameraFar      = 1024;
+		                spot1.castShadow            = true;
+		                spot1.shadowDarkness        = 0.3;
+		                spot1.shadowBias = 0.0001;
+		                spot1.shadowMapWidth = 2048;
+		                spot1.shadowMapHeight = 2048;
+	                }
+	                scene.add( spot1 );
+                }
+				
+                // RENDERER
+
+                renderer = new THREE.WebGLRenderer({antialias:true});
+                renderer.setSize( container.offsetWidth, container.offsetHeight );
+
+                if (sceneInfo.shadows) {
+	                renderer.shadowMapEnabled = true;
+	                renderer.shadowMapSoft = true;
+	        		renderer.shadowMapType = THREE.PCFSoftShadowMap;
+                }
+                				
+                container.appendChild( renderer.domElement );
+
+				if (sceneInfo.addGround) {
+	                var groundMaterial = new THREE.MeshPhongMaterial({
+	                        color: 0xFFFFFF,
+	                        ambient: 0x888888,
+	                        shading: THREE.SmoothShading,
+	                    });
+	                var ground = new THREE.Mesh( new THREE.PlaneGeometry(1024, 1024), groundMaterial);
+
+	                if (sceneInfo.shadows) {
+		                ground.receiveShadow = true;
+	                }
+	                
+	                ground.position.z = -70;
+	                ground.rotation.x = -Math.PI / 2;
+	                
+	                scene.add(ground);
+				}
+				
+                loader = new THREE.glTFLoader( container );
+                loader.useBufferGeometry = useBufferGeometry;
+
+                loader.load( sceneInfo.url, function(data) {
+
+                	gltf = data;
+                	
+                	var object = gltf.scene;
+                	
+                	if (sceneInfo.cameraPos)
+                        defaultCamera.position.copy(sceneInfo.cameraPos);
+
+                	if (sceneInfo.center)
+                        orbitControls.center.copy(sceneInfo.center);
+                    
+                    if (sceneInfo.objectPosition)
+                        object.position.copy(sceneInfo.objectPosition);
+
+                    if (sceneInfo.objectRotation)
+                        object.rotation.copy(sceneInfo.objectRotation);
+
+                    if (sceneInfo.objectScale)
+                        object.scale.copy(sceneInfo.objectScale);
+
+                    cameraIndex = 0;
+                    cameras = [];
+                    cameraNames = [];
+                    if (gltf.cameras && gltf.cameras.length)
+                    {
+                        var i, len = gltf.cameras.length;
+                        for (i = 0; i < len; i++)
+                        {
+                            var addCamera = true;
+                            var cameraName = gltf.cameras[i].parent.name;
+                            if (sceneInfo.cameras && !(cameraName in sceneInfo.cameras)) {
+                                    addCamera = false;
+                            }
+
+                            if (addCamera) {
+                            	cameraNames.push(cameraName);
+                            	cameras.push(gltf.cameras[i]);
+                            }
+                        }
+
+                        updateCamerasList();
+                        switchCamera(1);
+                    }
+                    else
+                    {
+                        updateCamerasList();
+                        switchCamera(0);
+                    }
+
+    				if (gltf.animations && gltf.animations.length) {
+    					var i, len = gltf.animations.length;
+	    				for (i = 0; i < len; i++) {
+	    					var animation = gltf.animations[i];
+	    					animation.loop = true;
+    						animation.play();
+	    				}
+    				}
+                                       
+                    scene.add( object );
+
+                });
+
+        		orbitControls = new THREE.OrbitControls(defaultCamera, renderer.domElement);
+            }
+
+            function animate() {
+                requestAnimationFrame( animate );
+                THREE.glTFAnimator.update();
+                if (cameraIndex == 0)
+                    orbitControls.update();
+                render();
+            }
+
+            function render() {
+
+                renderer.render( scene, camera );
+            }
+			
+			function switchCamera(index)
+			{
+				cameraIndex = index;
+				
+				if (cameraIndex == 0) {
+					camera = defaultCamera;
+				}
+				if (cameraIndex >= 1 && cameraIndex <= cameras.length) {
+					camera = cameras[cameraIndex - 1];
+				}
+			}
+					
+			function updateCamerasList() {
+				var cameraNamesJSON = JSON.stringify(cameraNames);
+				CocoonJS.App.forwardAsync("updateCamerasList(" + cameraNamesJSON + ");");				
+			}
+
+			function toggleAnimations() {
+				var i, len = gltf.animations.length;
+				for (i = 0; i < len; i++) {
+					var animation = gltf.animations[i];
+					if (animation.running) {
+						animation.stop();
+					}
+					else {
+						animation.play();
+					}
+				}
+			}
+
+			function toggleBufferGeometry()
+			{
+				useBufferGeometry = !useBufferGeometry;
+			}
+			
+			function cleanup() {
+
+				if (container && renderer)
+				{
+					container.removeChild(renderer.domElement);
+				}
+
+	            cameraIndex = 0;
+				cameras = [];
+				cameraNames = [];
+				defaultCamera = null;
+				
+				if (!loader || !gltf.animations)
+					return;
+				
+				var i, len = gltf.animations.length;
+				for (i = 0; i < len; i++) {
+					var animation = gltf.animations[i];
+					if (animation.running) {
+						animation.stop();
+					}
+				}
+			}
+			
+            onload();
+        </script>
+
+    </body>
+</html>
