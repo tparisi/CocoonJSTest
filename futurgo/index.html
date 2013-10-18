@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Futurgo LTD</title>
+
+	<!-- Google font: PT Sans http://www.google.com/fonts#UsePlace:use/Collection:PT+Sans  -->
+	<link href='./css/fonts.css' rel='stylesheet' type='text/css'>
+	<link href="./css/futurgo.css" rel="stylesheet" type='text/css'/> 
+</head>
+<body onload="handleLoaded();">
+	<div id="container"></div>
+
+<!-- 
+    <script src="./libs/jquery-1.9.1/jquery-1.9.1.js"></script>
+    <script src="./libs/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js"></script>
+	<script src="./libs/colorpicker/js/colorpicker.js"></script>
+ -->
+	<script src="./libs/cocoon_cocoonjsextensions/CocoonJS.js"></script>
+	<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App.js"></script>
+	<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App_ForCocoonJS.js"></script>
+ 	<script src="./libs/vizi/vizi.js"></script>
+	<script src="futurgo.js"></script>
+	<script>
+
+	var container = null;
+   	var futurgo = null;
+   	var part_materials = [];
+   	
+	var handleLoaded = function() {
+
+		setupWebView();
+		setupCanvasView();
+		setupTouch();
+		run();
+	}
+	
+	function setupWebView() {
+		CocoonJS.App.onLoadInTheWebViewSucceed.addEventListener(
+				function(url) {
+					CocoonJS.App.showTheWebView();
+					Vizi.System.log("load web view succeeded.");
+					wvLoadComplete = true;
+				}
+				);
+		CocoonJS.App.onLoadInTheWebViewFailed.addEventListener(
+				function(url) {
+					Vizi.System.log("load web view failed.", url);
+				}
+				);
+		CocoonJS.App.loadInTheWebView("wv.html");
+	}
+	
+	function setupCanvasView() {
+		
+		container = document.getElementById("container");
+		futurgo = new Futurgo({ container : container,
+				loadCallback : onLoadComplete,
+				loadProgressCallback : onLoadProgress,
+				mouseOverCallback : onMouseOver,
+				mouseOutCallback : onMouseOut,
+			 });	
+
+	}
+
+	function run() {
+		
+		futurgo.go();
+
+	}
+
+	function setupTouch() {
+		container.addEventListener('touchmove', function(event) {
+			  // If there's exactly one finger inside this element
+			  if (event.targetTouches.length == 1) {
+			    var touch = event.targetTouches[0];
+
+			  }
+			}, false);
+	}
+	
+	function onLoadComplete(loadTime)
+	{
+		CocoonJS.App.forwardAsync("onLoadComplete(" + loadTime + ");");
+
+	}
+
+	function onLoadProgress(percentProgress)
+	{
+		CocoonJS.App.forwardAsync("onLoadProgress(" + percentProgress + ");");
+	}
+
+	function toggleInterior() {
+		futurgo.toggleInterior();
+	}
+
+	function toggleWheelAnimations() {
+		futurgo.toggleWheelAnimations();
+	}
+	
+	function showOverlay(what, e) {
+		// forward
+	}
+
+	function hideOverlay() {
+		// forward
+	}
+
+	function onMouseOver(what, event) {
+		//console.log("Mouse over", what, event);
+		showOverlay(what, event);
+	}
+
+	function onMouseOut(what, event) {
+		//console.log("Mouse out", what, event);
+		hideOverlay();
+	}
+
+	</script>
+	
+</body>
+</html>
