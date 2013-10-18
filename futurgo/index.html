@@ -36,6 +36,7 @@
 	}
 	
 	function setupWebView() {
+		
 		CocoonJS.App.onLoadInTheWebViewSucceed.addEventListener(
 				function(url) {
 					CocoonJS.App.showTheWebView();
@@ -59,6 +60,7 @@
 				loadProgressCallback : onLoadProgress,
 				mouseOverCallback : onMouseOver,
 				mouseOutCallback : onMouseOut,
+				mouseClickCallback : onMouseClick,
 			 });	
 
 	}
@@ -99,7 +101,9 @@
 	}
 	
 	function showOverlay(what, e) {
-		// forward
+		e.object = null;
+		var strevent = JSON.stringify(e);
+		CocoonJS.App.forwardAsync("showOverlay('" + what + "', " + strevent + ");");
 	}
 
 	function hideOverlay() {
@@ -116,6 +120,11 @@
 		hideOverlay();
 	}
 
+	function onMouseClick(what, event) {
+		//console.log("Mouse out", what, event);
+		showOverlay(what, event);
+	}
+		
 	</script>
 	
 </body>

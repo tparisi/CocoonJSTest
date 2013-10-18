@@ -10,6 +10,7 @@ Futurgo = function(param) {
 	this.loadProgressCallback = param.loadProgressCallback;
 	this.mouseOverCallback = param.mouseOverCallback;
 	this.mouseOutCallback = param.mouseOutCallback;
+	this.mouseClickCallback = param.mouseClickCallback;
 	this.part_materials = [];
 	this.vehicleOpen = false;
 	this.wheelsMoving = false;
@@ -53,6 +54,7 @@ Futurgo.prototype.onLoadComplete = function(data, loadStartTime)
 		var picker = new Vizi.Picker;
 		picker.addEventListener("mouseover", function(event) { that.onMouseOver("glass", event); });
 		picker.addEventListener("mouseout", function(event) { that.onMouseOut("glass", event); });
+		picker.addEventListener("click", function(event) { that.onMouseClick("glass", event); });
 		o.addComponent(picker);
 	});
 
@@ -74,6 +76,7 @@ Futurgo.prototype.onLoadComplete = function(data, loadStartTime)
 		var picker = new Vizi.Picker;
 		picker.addEventListener("mouseover", function(event) { that.onMouseOver("body", event); });
 		picker.addEventListener("mouseout", function(event) { that.onMouseOut("body", event); });
+		picker.addEventListener("click", function(event) { that.onMouseClick("body", event); });
 		o.addComponent(picker);
 	});
 
@@ -82,6 +85,7 @@ Futurgo.prototype.onLoadComplete = function(data, loadStartTime)
 		var picker = new Vizi.Picker;
 		picker.addEventListener("mouseover", function(event) { that.onMouseOver("wheels", event); });
 		picker.addEventListener("mouseout", function(event) { that.onMouseOut("wheels", event); });
+		picker.addEventListener("click", function(event) { that.onMouseClick("wheels", event); });
 		o.addComponent(picker);
 	});
 	
@@ -218,6 +222,11 @@ Futurgo.prototype.onMouseOver = function(what, event) {
 Futurgo.prototype.onMouseOut = function(what, event) {
 	if (this.mouseOutCallback)
 		this.mouseOutCallback(what, event);
+}
+
+Futurgo.prototype.onMouseClick = function(what, event) {
+	if (this.mouseClickCallback)
+		this.mouseClickCallback(what, event);
 }
 
 Futurgo.URL = "./models/futurgo/futurgo.json";
