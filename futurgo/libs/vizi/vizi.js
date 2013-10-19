@@ -49093,6 +49093,8 @@ Vizi.GraphicsThreeJS.prototype.initMouse = function()
 			function(e) { that.onDocumentMouseDoubleClick(e); }, false );
 	
 	
+ 	dom.addEventListener( 'touchend', 
+			function(e) { that.onDocumentTouchEnd(e); }, false );
 }
 
 Vizi.GraphicsThreeJS.prototype.initKeyboard = function()
@@ -49300,7 +49302,8 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseMove = function(event)
 //	var offset = $(this.renderer.domElement).offset();
 	
 	var offset = {
-			left : 0, top : 0,
+			left : this.renderer.domElement.offsetLeft, 
+			top : this.renderer.domElement.offsetTop,
 	};
 	
 	var eltx = event.pageX - offset.left;
@@ -49326,7 +49329,8 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseDown = function(event)
 //	var offset = $(this.renderer.domElement).offset();
 	
 	var offset = {
-			left : 0, top : 0,
+			left : this.renderer.domElement.offsetLeft, 
+			top : this.renderer.domElement.offsetTop,
 	};
 	
 	var eltx = event.pageX - offset.left;
@@ -49352,7 +49356,8 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseUp = function(event)
 //	var offset = $(this.renderer.domElement).offset();
 	
 	var offset = {
-			left : 0, top : 0,
+			left : this.renderer.domElement.offsetLeft, 
+			top : this.renderer.domElement.offsetTop,
 	};
 	
 	var eltx = event.pageX - offset.left;
@@ -49378,7 +49383,8 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseClick = function(event)
 //	var offset = $(this.renderer.domElement).offset();
 	
 	var offset = {
-			left : 0, top : 0,
+			left : this.renderer.domElement.offsetLeft, 
+			top : this.renderer.domElement.offsetTop,
 	};
 	
 	var eltx = event.pageX - offset.left;
@@ -49395,6 +49401,28 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseClick = function(event)
     }	            
 
     Vizi.Application.handleMouseClick(evt);
+}
+
+Vizi.GraphicsThreeJS.prototype.onDocumentTouchEnd = function(event)
+{
+	// synthesize a left mouse button event
+	var mouseEvent = {
+		'type': 'click',
+	    'view': event.view,
+	    'bubbles': event.bubbles,
+	    'cancelable': event.cancelable,
+	    'detail': event.detail,
+	    'screenX': event.changedTouches[0].screenX,
+	    'screenY': event.changedTouches[0].screenY,
+	    'clientX': event.changedTouches[0].clientX,
+	    'clientY': event.changedTouches[0].clientY,
+	    'pageX': event.changedTouches[0].pageX,
+	    'pageY': event.changedTouches[0].pageY,
+	    'button': 0,
+	    preventDefault: function() {}
+	};
+	
+	this.onDocumentMouseClick(mouseEvent);
 }
 
 Vizi.GraphicsThreeJS.prototype.onDocumentMouseDoubleClick = function(event)

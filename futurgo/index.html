@@ -31,11 +31,12 @@
 
 		setupWebView();
 		setupCanvasView();
-		setupTouch();
 		run();
 	}
 	
 	function setupWebView() {
+
+		// return;
 		
 		CocoonJS.App.onLoadInTheWebViewSucceed.addEventListener(
 				function(url) {
@@ -69,16 +70,6 @@
 		
 		futurgo.go();
 
-	}
-
-	function setupTouch() {
-		container.addEventListener('touchmove', function(event) {
-			  // If there's exactly one finger inside this element
-			  if (event.targetTouches.length == 1) {
-			    var touch = event.targetTouches[0];
-
-			  }
-			}, false);
 	}
 	
 	function onLoadComplete(loadTime)
@@ -121,7 +112,7 @@
 	}
 
 	function onMouseClick(what, event) {
-		//console.log("Mouse out", what, event);
+		console.log("Mouse click", what, event);
 		showOverlay(what, event);
 	}
 		

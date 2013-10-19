@@ -226,7 +226,8 @@ body {
 	z-index:2;
 	display:none;
 	width:180px;
-	left:66%;
+	left:64%;
+	top:20%;
 	position:absolute;
 	border:1px solid;
 }
