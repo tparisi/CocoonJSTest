@@ -259,11 +259,6 @@ OmegaCity.prototype.initTimers = function() {
 
 OmegaCity.prototype.play = function() {
 
-	return;
-	
-	this.run();
-	return;
-	
 	var playerCamera = OmegaCity.playerCameras["player1-int"];
 	this.viewer.useCamera(playerCamera);
 
@@ -287,7 +282,7 @@ OmegaCity.prototype.run = function() {
 
 	var that = this;
 	
-	requestAnimationFrame(function() {that.run(); });
+	// requestAnimationFrame(function() {that.run(); });
 	
 	this.evaluate();
 }

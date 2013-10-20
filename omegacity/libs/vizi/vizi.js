@@ -44830,7 +44830,6 @@ if ( !window.requestAnimationFrame ) {
 	} )();
 
 }
-
 var CLOSURE_NO_DEPS = true;
 // Copyright 2006 The Closure Library Authors. All Rights Reserved.
 //
@@ -48918,9 +48917,9 @@ Vizi.GraphicsThreeJS.prototype.initialize = function(param)
 
 Vizi.GraphicsThreeJS.prototype.focus = function()
 {
-	if (this.renderer && this.renderer.domElement)
+	if (this.renderer && this.renderer.domElement && this.renderer.domElement.focus)
 	{
-//		this.renderer.domElement.focus();
+		this.renderer.domElement.focus();
 	}
 }
 
@@ -49024,15 +49023,16 @@ Vizi.GraphicsThreeJS.prototype.initMouse = function()
 	dom.addEventListener( 'mousedown', 
 			function(e) { that.onDocumentMouseDown(e); }, false );
 	dom.addEventListener( 'mouseup', 
-			function(e) { that.onDocumentMouseUp(e); }, false );
-
- 
+			function(e) { that.onDocumentMouseUp(e); }, false ); 
  	dom.addEventListener( 'click', 
 			function(e) { that.onDocumentMouseClick(e); }, false );
-
 	dom.addEventListener( 'dblclick', 
 			function(e) { that.onDocumentMouseDoubleClick(e); }, false );
-	
+
+	dom.addEventListener( 'mousewheel', 
+			function(e) { that.onDocumentMouseScroll(e); }, false );
+	dom.addEventListener( 'DOMMouseScroll', 
+			function(e) { that.onDocumentMouseScroll(e); }, false );
 	
 }
 
@@ -49238,10 +49238,9 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseMove = function(event)
 {
     event.preventDefault();
     
-//	var offset = $(this.renderer.domElement).offset();
-	
 	var offset = {
-			left : 0, top : 0,
+			left : this.renderer.domElement.offsetLeft, 
+			top : this.renderer.domElement.offsetTop,
 	};
 	
 	var eltx = event.pageX - offset.left;
@@ -49264,10 +49263,9 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseDown = function(event)
 {
     event.preventDefault();
     
-//	var offset = $(this.renderer.domElement).offset();
-	
 	var offset = {
-			left : 0, top : 0,
+			left : this.renderer.domElement.offsetLeft, 
+			top : this.renderer.domElement.offsetTop,
 	};
 	
 	var eltx = event.pageX - offset.left;
@@ -49290,11 +49288,13 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseUp = function(event)
 {
     event.preventDefault();
 
-//	var offset = $(this.renderer.domElement).offset();
-	
 	var offset = {
-			left : 0, top : 0,
+			left : this.renderer.domElement.offsetLeft, 
+			top : this.renderer.domElement.offsetTop,
 	};
+	
+	var eltx = event.pageX - offset.left;
+	var elty = event.pageY - offset.top;
 	
 	var eltx = event.pageX - offset.left;
 	var elty = event.pageY - offset.top;
@@ -49316,11 +49316,13 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseClick = function(event)
 {
     event.preventDefault();
 
-//	var offset = $(this.renderer.domElement).offset();
-	
 	var offset = {
-			left : 0, top : 0,
+			left : this.renderer.domElement.offsetLeft, 
+			top : this.renderer.domElement.offsetTop,
 	};
+	
+	var eltx = event.pageX - offset.left;
+	var elty = event.pageY - offset.top;
 	
 	var eltx = event.pageX - offset.left;
 	var elty = event.pageY - offset.top;
@@ -49342,11 +49344,13 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseDoubleClick = function(event)
 {
     event.preventDefault();
 
-//	var offset = $(this.renderer.domElement).offset();
-	
 	var offset = {
-			left : 0, top : 0,
+			left : this.renderer.domElement.offsetLeft, 
+			top : this.renderer.domElement.offsetTop,
 	};
+	
+	var eltx = event.pageX - offset.left;
+	var elty = event.pageY - offset.top;
 	
 	var eltx = event.pageX - offset.left;
 	var elty = event.pageY - offset.top;
@@ -49364,11 +49368,23 @@ Vizi.GraphicsThreeJS.prototype.onDocumentMouseDoubleClick = function(event)
     Vizi.Application.handleMouseDoubleClick(evt);
 }
 
-Vizi.GraphicsThreeJS.prototype.onDocumentMouseScroll = function(event, delta)
+Vizi.GraphicsThreeJS.prototype.onDocumentMouseScroll = function(event)
 {
     event.preventDefault();
 
-    var evt = { type : "mousescroll", delta : delta };
+	var delta = 0;
+
+	if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
+
+		delta = event.wheelDelta;
+
+	} else if ( event.detail ) { // Firefox
+
+		delta = - event.detail;
+
+	}
+
+	var evt = { type : "mousescroll", delta : delta };
     
     Vizi.Mouse.instance.onMouseScroll(evt);
 
@@ -49530,10 +49546,7 @@ Vizi.Services.create = function(serviceName)
 		
 		if (Vizi.Services[serviceName])
 		{
-			
-//	        throw new Error('Cannot create two ' + serviceName + ' service instances');
-			Vizi.System.warn('Creating second ' + serviceName + ' service instance');
-			return Vizi.Services[serviceName];
+	        throw new Error('Cannot create two ' + serviceName + ' service instances');
 		}
 		else
 		{

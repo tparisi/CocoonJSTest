@@ -4,8 +4,6 @@
  */
 
 ProxySound = function(param) {
-	this.game = param.game;
-	this.game.hud = this;
 }
 
 ProxySound.prototype.enterState = function(state, data) {

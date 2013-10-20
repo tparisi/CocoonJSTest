@@ -82,20 +82,24 @@
 	<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App.js"></script>
 	<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App_ForWebView.js"></script>
 	<script src="omegacityGameProxy.js"></script>
+	<script src="omegacityProxySound.js"></script>
 	<script src="omegacityHUD.js"></script>
 	<script>
 
    	var hud = null;
    	var game = null;
+   	var sound = null;
    	
 	var onload = function() {
 
 		hud = new OmegaCityHUD();
+		sound = new ProxySound();
 		game = new OmegaCityGameProxy();
 	}
 
 	function startGame() {
 		hud.enterState("play");
+		sound.enterState("play");
 		game.play();
 	}
 

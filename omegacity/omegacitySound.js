@@ -8,8 +8,6 @@ OmegaCitySound = function(param) {
 	this.game = param.game;
 	this.game.sound = this;
 	
-	return;
-	
 	this.entryNoise = document.getElementById("entry_noise");
 	this.entryMusic = document.getElementById("entry_music");
 	this.engines = document.getElementById("engines");
@@ -45,7 +43,6 @@ OmegaCitySound = function(param) {
 }
 
 OmegaCitySound.prototype.enterState = function(state, data) {
-	return;
 	
 	switch (state) {
 		case "load" :
@@ -72,7 +69,6 @@ OmegaCitySound.prototype.enterState = function(state, data) {
 }
 
 OmegaCitySound.prototype.leaveState = function(state, data) {
-	return;
 	
 	switch (state) {
 	case "alert" :
