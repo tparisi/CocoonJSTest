@@ -49025,6 +49025,8 @@ Vizi.GraphicsThreeJS.prototype.initialize = function(param)
 
 Vizi.GraphicsThreeJS.prototype.focus = function()
 {
+	return;
+	
 	if (this.renderer && this.renderer.domElement)
 	{
 		this.renderer.domElement.focus();

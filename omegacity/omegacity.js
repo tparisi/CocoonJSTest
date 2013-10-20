@@ -22,6 +22,7 @@ OmegaCity.prototype.load = function() {
 	this.viewer.run();
 	this.viewer.focus();
 	this.viewer.mouseDelegate = this;
+	this.viewer.touchDelegate = this;
 	this.viewer.keyboardDelegate = this;
 }
 
@@ -478,6 +479,11 @@ OmegaCity.prototype.onMouseClick = function(event) {
 }
 
 OmegaCity.prototype.onMouseDoubleClick = function(event) {
+}
+
+OmegaCity.prototype.onTouchStart = function(event) {
+	this.enterState("fireLasers");
+	
 }
 
 OmegaCity.prototype.onKeyPress = function(event) {
