@@ -49527,26 +49527,35 @@ Vizi.GraphicsThreeJS.prototype.translateTouch = function(touch, offset) {
 	}
 }
 
+var cocoonDoScenePick = false;
+
 Vizi.GraphicsThreeJS.prototype.onDocumentTouchStart = function(event)
 {
     event.preventDefault();
-    
-	var offset = {
-			left : this.renderer.domElement.offsetLeft, 
-			top : this.renderer.domElement.offsetTop,
-	};
 
-	var touches = [];
-	var i, len = event.touches.length;
-	for (i = 0; i < len; i++) {
-		touches.push(this.translateTouch(event.touches[i], offset));
-	}
-
-	var evt = { type : event.type, touches : touches };
+    if (cocoonDoScenePick) {
+    	// hack for CocoonJS picking for now
+    	
+		var offset = {
+				left : this.renderer.domElement.offsetLeft, 
+				top : this.renderer.domElement.offsetTop,
+		};
 	
-    if (Vizi.PickManager)
-    {
-    	Vizi.PickManager.handleTouchStart(evt);
+		var touches = [];
+		var i, len = event.touches.length;
+		for (i = 0; i < len; i++) {
+			touches.push(this.translateTouch(event.touches[i], offset));
+		}
+	
+		var evt = { type : event.type, touches : touches };
+		
+	    if (Vizi.PickManager)
+	    {
+	    	Vizi.PickManager.handleTouchStart(evt);
+	    }
+    }
+    else {
+    	console.log("touch start: ignoring scene pick");
     }
     
     Vizi.Application.handleTouchStart(evt);
@@ -49556,22 +49565,26 @@ Vizi.GraphicsThreeJS.prototype.onDocumentTouchMove = function(event)
 {
     event.preventDefault();
     
-	var offset = {
-			left : this.renderer.domElement.offsetLeft, 
-			top : this.renderer.domElement.offsetTop,
-	};
-	
-	var touches = [];
-	var i, len = event.touches.length;
-	for (i = 0; i < len; i++) {
-		touches.push(this.translateTouch(event.touches[i], offset));
-	}
-
-	var evt = { type : event.type, touches : touches };
-		    
-    if (Vizi.PickManager)
-    {
-    	Vizi.PickManager.handleTouchMove(evt);
+    if (cocoonDoScenePick) {
+    	// hack for CocoonJS picking for now
+    	
+		var offset = {
+				left : this.renderer.domElement.offsetLeft, 
+				top : this.renderer.domElement.offsetTop,
+		};
+		
+		var touches = [];
+		var i, len = event.touches.length;
+		for (i = 0; i < len; i++) {
+			touches.push(this.translateTouch(event.touches[i], offset));
+		}
+		
+		var evt = { type : event.type, touches : touches };
+			    
+		if (Vizi.PickManager)
+		{
+			Vizi.PickManager.handleTouchMove(evt);
+		}
     }
     
     Vizi.Application.handleTouchMove(evt);
@@ -49581,24 +49594,31 @@ Vizi.GraphicsThreeJS.prototype.onDocumentTouchEnd = function(event)
 {
     event.preventDefault();
 
-	var offset = {
-			left : this.renderer.domElement.offsetLeft, 
-			top : this.renderer.domElement.offsetTop,
-	};
+    if (cocoonDoScenePick) {
+    	// hack for CocoonJS picking for now
+    	
+		var offset = {
+				left : this.renderer.domElement.offsetLeft, 
+				top : this.renderer.domElement.offsetTop,
+		};
+		
+		var changedTouches = [];
+		var i, len = event.changedTouches.length;
+		for (i = 0; i < len; i++) {
+			changedTouches.push(this.translateTouch(event.changedTouches[i], offset));
+		}
 	
-	var changedTouches = [];
-	var i, len = event.changedTouches.length;
-	for (i = 0; i < len; i++) {
-		changedTouches.push(this.translateTouch(event.changedTouches[i], offset));
-	}
-
-	var evt = { type : event.type, changedTouches : changedTouches };    
+		var evt = { type : event.type, changedTouches : changedTouches };    
+	    
+	    if (Vizi.PickManager)
+	    {
+	    	Vizi.PickManager.handleTouchEnd(evt);
+	    }	            
+    }
+    else {
+    	console.log("touch end: ignoring scene pick");
+    }
     
-    if (Vizi.PickManager)
-    {
-    	Vizi.PickManager.handleTouchEnd(evt);
-    }	            
-
     Vizi.Application.handleTouchEnd(evt);
 }
 

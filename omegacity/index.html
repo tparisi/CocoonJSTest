@@ -11,17 +11,20 @@
 	<div id="container" style="width:100%;height:100%;position:absolute;"></div>
 	<!--  Audio, should work? -->
 	<!--  Audio content  -->
+	<!--  WORKAROUND for CocoonJS - they don't parse these tags;
+			do it in code
+			
 	<audio volume="0.0" id="entry_noise">
-	  <source src="./sounds/entrynoise.wav" type="audio/wav" />
-	  Your browser does not support WAV files in the audio element.
+	  <source src="./sounds/entrynoise.ogg" type="audio/ogg" />
+	  Your browser does not support OGG files in the audio element.
 	</audio>
 	<audio volume="0.0" id="entry_music">
 	  <source src="./sounds/entrymusic.mp3" type="audio/mp3" />
 	  Your browser does not support MP3 files in the audio element.
 	</audio>
 	<audio volume="0.0" id="engines">
-	  <source src="./sounds/enginesturbinesone.wav" type="audio/wav" />
-	  Your browser does not support WAV files in the audio element.
+	  <source src="./sounds/enginesturbinesone.ogg" type="audio/ogg" />
+	  Your browser does not support OGG files in the audio element.
 	</audio>
 	<audio volume="0.0" id="laser">
 	  <source src="./sounds/shortlaser.wav" type="audio/wav" />
@@ -32,8 +35,8 @@
 	  Your browser does not support MP3 files in the audio element.
 	</audio>
 	<audio volume="0.0" id="power_up">
-	  <source src="./sounds/flash-sound-jet.wav" type="audio/wav" />
-	  Your browser does not support WAV files in the audio element.
+	  <source src="./sounds/flash-sound-jet.ogg" type="audio/ogg" />
+	  Your browser does not support OGG files in the audio element.
 	</audio>
 	<audio volume="0.0" id="missile_locked_on">
 	  <source src="./sounds/missile-lock-on-sound.mp3" type="audio/mp3" />
@@ -51,6 +54,7 @@
 	  <source src="./sounds/no-information.wav" type="audio/wav" />
 	  Your browser does not support WAV files in the audio element.
 	</audio>
+	 -->
 	<script src="./libs/cocoon_cocoonjsextensions/CocoonJS.js"></script>
 	<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App.js"></script>
 	<script src="./libs/cocoon_cocoonjsextensions/CocoonJS_App_ForCocoonJS.js"></script>
@@ -102,6 +106,7 @@
 				
 		sound.enterState("load");
 		game.load();
+
 	}
 
 	
@@ -125,7 +130,7 @@
 	}
 
 	function playGame() {
-//		sound.enterState("play");
+		sound.enterState("play");
 		Vizi.System.log("In playGame()");
 		game.play();
 	}

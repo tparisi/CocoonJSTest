@@ -2,6 +2,8 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" 
+  content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Omega City</title>
 
 	<link href='./css/fonts.css' rel='stylesheet' type='text/css'>
@@ -98,16 +100,20 @@
 	}
 
 	function startGame() {
-		hud.enterState("play");
-		sound.enterState("play");
 		game.play();
 	}
 
 	function hudEnterState(state, data) {
-		console.log("HUD state: ", state, data);
+		console.log("HUD state: " + state + " " + data);
 		hud.enterState(state, data);
 	}
-	</script>
+
+	function hudUpdateMissileCount(count) {
+//		console.log("HUD state: ", state, data);
+		hud.updateMissileCount(count);
+	}
+	
+</script>
 	
 </body>
 </html>

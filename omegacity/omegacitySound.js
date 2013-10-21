@@ -8,6 +8,8 @@ OmegaCitySound = function(param) {
 	this.game = param.game;
 	this.game.sound = this;
 	
+	this.loadSounds();
+	
 	this.entryNoise = document.getElementById("entry_noise");
 	this.entryMusic = document.getElementById("entry_music");
 	this.engines = document.getElementById("engines");
@@ -170,3 +172,31 @@ OmegaCitySound.prototype.stopAlert = function(name) {
 			break;
 	}
 }
+
+OmegaCitySound.prototype.loadSounds = function() {
+	// CocoonJS workaround for not parsing HTML audio correctly
+
+	var sources = OmegaCitySound.sources,
+		i = 0, len = sources.length;
+	
+	for (i = 0; i < len; i++) {
+		var audio = new Audio();
+		audio.id = sources[i].id;
+		audio.src = sources[i].src;
+		document.body.appendChild(audio);	
+	}
+}
+
+OmegaCitySound.sources = [
+                          { id : "entry_noise", src : "./sounds/entrynoise.ogg" },
+                          { id : "entry_music", src : "./sounds/entrymusic.mp3" },
+                          { id : "engines", src : "./sounds/enginesturbinesone.ogg" },
+                          { id : "laser", src : "./sounds/entrynoise.ogg" },
+                          { id : "missile", src : "./sounds/missile-firing-fl.mp3" },
+                          { id : "power_up", src : "./sounds/flash-sound-jet.ogg" },
+                          { id : "missile_locked_on", src : "./sounds/missile-lock-on-sound.mp3" },
+                          { id : "explosion", src : "./sounds/explosion4-trimmed.wav" },
+                          { id : "proximity_alert", src : "./sounds/proximity-alert.wav" },
+                          { id : "no_information", src : "./sounds/no-information.wav" },
+                          ];
+

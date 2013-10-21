@@ -13,6 +13,9 @@ OmegaCity = function(param) {
 	this.fps = 0;
 	this.turndir = 0;
 	this.turnSpeed = 0.025;
+	this.touchStartTime = 0;
+	this.firing = false;
+	this.lastFireTime = 0;
 }
 
 OmegaCity.prototype.load = function() {
@@ -236,8 +239,26 @@ OmegaCity.prototype.onPropsLoadComplete = function(data) {
 }
 
 OmegaCity.prototype.initTimers = function() {
+
+	// Main clock to drive evaluate
+	var clock = new Vizi.Object;
+	var timer = new Vizi.Timer({
+		loop : true
+	});
+
+	var that = this;
+	timer.addEventListener("time", function() {
+		that.evaluate();
+	});
 	
-	var NOINFO_DURATION = 40000;
+	clock.addComponent(timer);
+	
+	this.viewer.addObject(clock);
+
+	this.mainTimer = timer;
+
+	// Automated no info message
+	var NOINFO_DURATION = 40000; // ms
 	
 	var clock = new Vizi.Object;
 	var timer = new Vizi.Timer({
@@ -260,6 +281,9 @@ OmegaCity.prototype.initTimers = function() {
 
 OmegaCity.prototype.play = function() {
 
+	this.hud.enterState("play");
+	this.sound.enterState("play");
+
 	var playerCamera = OmegaCity.playerCameras["player1-int"];
 	this.viewer.useCamera(playerCamera);
 
@@ -271,21 +295,11 @@ OmegaCity.prototype.play = function() {
 	
 	this.viewer.focus();
 
+	this.mainTimer.start();
 	this.noInformationTimer.start();
 
 	this.elapsedTime = 0;
 	this.startTime = Date.now();
-	
-	this.run();
-}
-
-OmegaCity.prototype.run = function() {
-
-	var that = this;
-	
-	// requestAnimationFrame(function() {that.run(); });
-	
-	this.evaluate();
 }
 
 OmegaCity.MAX_TURN_RIGHT = Math.PI / 8;
@@ -305,7 +319,8 @@ OmegaCity.prototype.evaluate = function() {
 		}
 	}
 	
-	this.elapsedTime = Date.now() - this.startTime;
+	var now = Date.now();
+	this.elapsedTime = now - this.startTime;
 	
 	var player1pos = this.player1Group.transform.position;
 	var alienpos = this.alienGroup.transform.position;
@@ -318,6 +333,33 @@ OmegaCity.prototype.evaluate = function() {
 	}
 	else {
 		this.leaveState("proximityAlert");
+	}
+	
+	if (this.launching) {
+
+		console.log("Launching missile...");
+
+		this.enterState("fireMissile");
+		this.launching = false;
+	}
+
+	if (this.touched) {
+		var touchDelta = now - this.touchStartTime;
+		if (this.touchStartTime && (touchDelta >= OmegaCity.DOUBLETAP_DELAY) &&
+				!this.firing) {
+			console.log("Firing...");
+			this.firing = true;
+			this.launching = false;
+		}
+		
+		if (this.firing) {
+			
+			var deltafire = now - this.lastFireTime;
+			if (deltafire >= OmegaCity.FIRING_INTERVAL) {
+				this.enterState("fireLasers");
+				this.lastFireTime = now;
+			}
+		}
 	}
 }
 
@@ -482,8 +524,25 @@ OmegaCity.prototype.onMouseDoubleClick = function(event) {
 }
 
 OmegaCity.prototype.onTouchStart = function(event) {
-	this.enterState("fireLasers");
 	
+	var now = Date.now();
+	var tapDelay = now - this.touchStartTime;
+
+	console.log("Tap delay", tapDelay);
+	
+	if (this.touchStartTime && (tapDelay <= OmegaCity.DOUBLETAP_DELAY)) {
+		this.launching = true;
+		this.firing = false;
+	}
+
+	this.touched = true;
+	this.touchStartTime = now;
+}
+
+OmegaCity.prototype.onTouchEnd = function(event) {
+	
+	this.touched = false;
+	this.firing = false;
 }
 
 OmegaCity.prototype.onKeyPress = function(event) {
@@ -525,3 +584,5 @@ OmegaCity.prototype.onKeyUp = function(event) {
 
 OmegaCity.URL = "./models/vc/vc.json";
 OmegaCity.missileURL = "./models/missile/missile-fixed.json";
+OmegaCity.FIRING_INTERVAL = 100; // ms
+OmegaCity.DOUBLETAP_DELAY = 250; // ms
