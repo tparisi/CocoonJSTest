@@ -191,7 +191,7 @@ OmegaCitySound.sources = [
                           { id : "entry_noise", src : "./sounds/entrynoise.ogg" },
                           { id : "entry_music", src : "./sounds/entrymusic.mp3" },
                           { id : "engines", src : "./sounds/enginesturbinesone.ogg" },
-                          { id : "laser", src : "./sounds/entrynoise.ogg" },
+                          { id : "laser", src : "./sounds/shortlaser.wav" },
                           { id : "missile", src : "./sounds/missile-firing-fl.mp3" },
                           { id : "power_up", src : "./sounds/flash-sound-jet.ogg" },
                           { id : "missile_locked_on", src : "./sounds/missile-lock-on-sound.mp3" },
